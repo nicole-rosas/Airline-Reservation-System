@@ -1,0 +1,346 @@
+// checks if seat is taken
+boolean seatTaken(ARRAY, row, col) {
+	return (ARRAY[row][col] != 0);
+}
+
+// checks if given section is full
+boolean isFull(ARRAY, char class){ 
+	if (class == 'f') {
+		return (!isEmpty(ARRAY, 1, 3));
+	}
+	else if (class == 'b') {
+		return (!isEmpty(ARRAY, 4, 7));
+	}
+	else {
+		return (!isEmpty(ARRAY, 8, 20));
+	}
+}
+
+// generate a random seats
+string genSeat(ARRAY, char class) {
+	if (class == 'f'){
+		generate row = random(1-3);
+		generate col = random(1-6);
+		if (seatTaken(ARRAY, row, col)) {
+			genSeat(ARRAY, class);
+		} else {
+			return seatToString(row, col);
+		}
+	}
+	else if (class == 'b'){
+		generate row = random(4-7);
+		generate col = random(1-6);
+		if (seatTaken(ARRAY, row, col) {
+			genSeat(ARRAY, class);
+		} else {
+			return seatToString(ARRAY, row, col);
+		}
+	}
+	else {
+		generate row = random(8-20);
+		generate col = random(1-6);
+		if (seatTaken(Array, row, col) {
+			genSeat(ARRAY, row, col);
+		} else {
+			return seatToString(Array, row, col);
+		}
+	}
+}
+
+// make row num and col num and return as seat
+string seatToString(row, col) {
+	string seat = "";
+	switch(row) {
+		case 1:
+			seat += "A"
+		case 2:
+			seat += "B"
+		case 3:
+			seat += "D"
+		case 4:
+			seat += "E"
+		case 5:
+			seat += "F"
+		case 6:
+			seat += "H"
+		default:
+			seat += "I"
+	}
+	seat += col
+	return seat;
+}
+
+// finds if there are available rows from given start and end points. If there are available rows we return true
+boolean availRows(ARRAY[y][x], int start, int end) {
+  boolean isEmpty = false;
+  for (int c = start; c < end; c++) {
+    for(int r = 0; r <= end; r++) {
+      if (!seatTaken[r][c]) {
+        isEmpty = true;
+      }
+    }
+  }
+  return isEmpty;
+}
+
+def airlineReservationSystem() {
+  seatChart <-- 2D (7 x 20) array, initialize all elements to 0 //0 if empty, 1 if taken
+  passManif <-- vector of size 140 of vectors of size 2 //name to seat assignment
+
+  while (true) {
+    print "Select Menu Option: 
+    1. Load Previous Assignment
+    2. Save Current Assignment
+    3. Choose a seat 
+    4. Cancel seat assignment
+    5. Print Boarding Pass
+    6. Display Seating Chart
+    7. Print Passenger Manifest
+    8. Quit Program"
+
+    in <-- int input
+
+    switch in {
+      case 1: //load
+        print "Loading Previous Assignment and Manifest..."
+
+        read from file("SavedSeating.txt"):
+          for r from 1 to 7 {
+            for c from 1 to 20 {
+              if r is 3 or 6 { 
+                for i from 1 to 20 {
+                  ignore line
+                }
+              }
+              seatChart[r][c] = next non-space char in file //use tokens
+            }
+          }
+
+        read from file("SavedManifest.txt"):
+          passManif <-- new vector of size 140 of vectors of size 2 //re-initialize
+
+          ignore first line
+          for each line in file {
+            passManif push new vector[get name, get int];
+          }
+
+      case 2: //save
+        print "Saving..."
+
+        remove file("SavedSeating.txt");
+        remove file("SavedManifest.txt");
+
+        print to file("SavedSeating.txt"):
+          for r from 1 to 7 {
+            //Printing the Aisles
+            if r is 3 or 6 { 
+              for i from 1 to 20 {
+                if i is 1 {
+                  print "  " //for spacing
+                }
+                print i + " " //print the row number
+              }
+            }
+            
+            //Printing the Seating Availability
+            for c from 1 to 20 {
+              if seatChart[r][c] is 1 {
+                print "X "
+              } else {
+                print "O " //can change later but general sign to show that it is empty
+              }
+            }
+          print new line
+        }
+      
+      print to file (SavedManifest.txt"):
+        sort(passManif) //sorts passManif from least to greatest by seat number
+        print "Name   Seat"
+        for p in passManifest {
+          print p[0], p[1] //use correct spacing 
+        }
+          
+      case 3: //choose seat
+        print "Enter your full name: "
+        name <-- string input
+        
+        print "Select a Travel Class:
+          Enter 'F' for First Class
+          Enter 'B' for Business Class
+          Enter any other key for Economy Class."
+        
+        class <-- char input
+
+        while(true) { //Initial Seat Selection
+          if class is 'F' { //FIRST        
+            if first class is full { //Ask if user wants to downgrade
+              print "First class has already been filled. Is business class okay?
+                y for yes
+                n for no"
+
+              ans <-- char input
+              if ans is 'y' {
+                class <-- 'B'
+                continue
+              } else {
+                print "We are so sorry to hear that. Unfortunately, there are no other options available, but we hope to catch you on another flight! Sending back to main menu..."
+                break
+              }
+            }
+            
+            //Generate Random Seat
+            seat <-- genSeat(seatChart, class)
+            
+            //Asking for Downgrade
+            print "We have found a seat for you in First Class. Would you like to
+              1. Downgrade to Business
+              2. Stay in First Class"
+            downgrade <-- int input
+            if downgrade is 1 {
+              class <-- 'B'
+              continue
+            } else {
+              print "Your seat assignment is: " + seat + ". Is this assignment okay?
+              y for yes
+              n for no"
+              ans <-- char input
+              if ans is 'y' {
+                Print "Great! Your final seat assignment is: " + seat + "."
+                passManif push vector(name , seat)
+              }
+            }
+          } else if class is 'B' { //BUSINESS
+            if business class is full { //Ask if user wants to downgrade
+              print "Business class has already been filled. Is economy seating okay?
+                y for yes
+                n for no"
+
+              ans <-- char input
+              if ans is 'y' {
+                class <-- 'E'
+                continue
+              } else {
+                print "We are so sorry to hear that. Unfortunately, there are no other options available, but we hope to catch you on another flight! Sending back to main menu..."
+                break
+              }
+            }
+            
+            //Generate Random Seat
+            seat <-- genSeat(seatChart, class)
+            
+            //Asking for Downgrade, Upgrade, or Keep
+            print "We have found a seat for you in Business. Would you like to 
+              1. Upgrade to Business
+              2. Downgrade to Economy
+              3. Stay in Business"
+            changeClass <-- int input
+            if changeClass is 1 {
+              class <-- 'F'
+              continue
+            } else if changeClass is 2 {
+              class <-- 'E'
+              continue
+            } else {
+              print "Your seat assignment is: " + seat + ". Is this assignment okay?
+              y for yes
+              n for no"
+              ans <-- char input
+              if ans is 'y' {
+                Print "Great! Your final seat assignment is: " + seat + "."
+                passManif push vector(name , seat)
+              }
+            }
+        } else { //ECONOMY
+          if(economy class is full) {
+            print "Sorry, there seem to be no seats available for this class. We hope to catch you on another flight! Sending back to main menu..."
+            break
+          }
+          
+          //Generate Random Seat
+          seat <-- genSeat(seatChart, class)
+
+          //Asking for Upgrade or Keep
+          print "We have found a seat for you in Economy. Would you like to 
+            1. Upgrade to Business
+            2. Stay in Economy"
+          changeClass <-- int input
+          if changeClass is 1 {
+            class <-- 'B'
+            continue
+          } else {
+            print "Your seat assignment is: " + seat + ". Is this assignment okay?
+            y for yes
+            n for no"
+            ans <-- char input
+            if ans is 'y' {
+              Print "Great! Your final seat assignment is: " + seat + "."
+              passManif push vector(name , seat)
+            }
+          }
+        }
+      case 4: 
+        ask for user input of seat number
+					input <-- seat
+				go into s.a and p.m and delete name and seat
+      case 5:
+        print "Enter seat number to print boarding pass: "
+        num <-- int input
+
+        for p in passManif {
+          rowNum <-- substring of p[1] from 1 to len(p[1]))
+          if(int(rowNum) = num) {
+            if(rowNum < 4) {
+              class <-- "First Class"
+            } else if (rowNum < 8) {
+              class <-- "Business Class"
+            } else {
+              class <-- "Economy Class"
+            }
+
+            print "NAME: " + p[0] + ", SEAT: " + p[1] + ", LEVEL: " + class
+            break
+          }
+        }
+      case 6: 
+        // print availibility map
+        for r from 1 to 7 {
+            //Printing the Aisles
+            if r is 3 or 6 { 
+              for i from 1 to 20 {
+                if i is 1 {
+                  print "  " //for spacing
+                }
+                print i + " " //print the row number
+              }
+            }
+            
+            //Printing the Seating Availability
+            for c from 1 to 20 {
+              if seatChart[r][c] is 1 {
+                print "X "
+              } else {
+                print "O " //can change later but general sign to show that it is empty
+              }
+            }
+          print new line
+        }  
+    case 7: 
+      // prints Passenger Manifest
+      ask user for either order of seats or alphabetical
+      if (num order) {
+        sortByLeastToGreatest(passManif);
+        print "Name\tab\tabSeat"
+        for p in passManif:
+          print p[0] + "\tab" + p[1] + endl;
+      } else {
+        sortByAlph(passManif);
+        print "Name\tab\tabSeat";
+        for p in passManif:
+          print p[0] + "\tab" + p[1] + endl;
+      } 
+    case 8:
+      // we end while loop for menu and return 0 to quit
+      break;
+    }    
+  }
+}
